@@ -1,0 +1,183 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isNotBanned() {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isBanned != true;
+    }
+
+    // Users: public read of safe profile fields, owner-only edits (role/isBanned/credits restricted to admin/server)
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if isSelf(userId) &&
+        request.resource.data.role == 'student' &&
+        request.resource.data.creditBalance == 0;
+      allow update: if isAdmin() || (
+        isSelf(userId) &&
+        request.resource.data.role == resource.data.role &&
+        request.resource.data.isBanned == resource.data.isBanned &&
+        request.resource.data.creditBalance == resource.data.creditBalance
+      );
+      allow delete: if isSelf(userId) || isAdmin();
+    }
+
+    // Listings: public read unless hidden by moderation; only verified owner can create/edit/delete
+    match /listings/{listingId} {
+      allow read: if resource.data.isHiddenByModeration != true ||
+        (isSignedIn() && resource.data.ownerId == request.auth.uid) ||
+        isAdmin();
+      allow create: if isSignedIn() && isNotBanned() &&
+        request.resource.data.ownerId == request.auth.uid;
+      allow update, delete: if isAdmin() ||
+        (isSignedIn() && isNotBanned() && resource.data.ownerId == request.auth.uid);
+    }
+
+    // Rental Requests & Handover Checklists: visible and editable only by renter, owner, or admin
+    match /requests/{requestId} {
+      allow read: if isSignedIn() && (
+        resource.data.renterId == request.auth.uid ||
+        resource.data.ownerId == request.auth.uid ||
+        isAdmin()
+      );
+      allow create: if isSignedIn() && isNotBanned() &&
+        request.resource.data.renterId == request.auth.uid &&
+        request.resource.data.status == 'Pending';
+      allow update: if isAdmin() || (
+        isSignedIn() && isNotBanned() && (
+          resource.data.renterId == request.auth.uid ||
+          resource.data.ownerId == request.auth.uid
+        )
+      );
+    }
+
+    // Wishlists: strictly private per user
+    match /wishlists/{wishlistId} {
+      allow read, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // Conversations & Messages: strictly restricted to the two participants
+    match /conversations/{convId} {
+      allow read, update: if isSignedIn() && request.auth.uid in resource.data.participantIds;
+      allow create: if isSignedIn() && isNotBanned() &&
+        request.auth.uid in request.resource.data.participantIds;
+
+      match /messages/{msgId} {
+        allow read: if isSignedIn() &&
+          request.auth.uid in get(/databases/$(database)/documents/conversations/$(convId)).data.participantIds;
+        allow create: if isSignedIn() && isNotBanned() &&
+          request.resource.data.senderId == request.auth.uid &&
+          request.auth.uid in get(/databases/$(database)/documents/conversations/$(convId)).data.participantIds;
+        allow update: if isSignedIn() &&
+          request.auth.uid in get(/databases/$(database)/documents/conversations/$(convId)).data.participantIds;
+      }
+    }
+
+    // Two-way Reviews: public read; creation only by booking participants once Returned; single owner reply
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isSignedIn() && isNotBanned() &&
+        request.resource.data.reviewerId == request.auth.uid &&
+        get(/databases/$(database)/documents/requests/$(request.resource.data.requestId)).data.status == 'Returned';
+      allow update: if isAdmin() || (
+        isSignedIn() && resource.data.revieweeId == request.auth.uid
+      );
+      allow delete: if isAdmin();
+    }
+
+    // Notifications: strictly private to owner
+    match /notifications/{notifId} {
+      allow read, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn();
+    }
+
+    // Verifications: creator and admin can read; only admin can approve/reject
+    match /verifications/{verId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAdmin();
+    }
+
+    // Referrals & Credit Transactions: read by owner/referee/admin; immutable from client
+    match /referrals/{refId} {
+      allow read: if isAdmin() || (isSignedIn() && (
+        resource.data.referrerId == request.auth.uid ||
+        resource.data.refereeId == request.auth.uid
+      ));
+      allow create: if isSignedIn() && request.resource.data.refereeId == request.auth.uid;
+      allow update: if isAdmin();
+    }
+
+    match /creditTransactions/{txId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    // Payments (Test Mode): read by booking participants or admin
+    match /payments/{paymentId} {
+      allow read: if isAdmin() || (isSignedIn() && (
+        resource.data.payerId == request.auth.uid ||
+        resource.data.payeeId == request.auth.uid
+      ));
+      allow create: if isSignedIn() && request.resource.data.payerId == request.auth.uid;
+      allow update: if isAdmin();
+    }
+
+    // Moderation Reports, Blocks & Support Tickets
+    match /reports/{reportId} {
+      allow read, update: if isAdmin();
+      allow create: if isSignedIn() && request.resource.data.reporterId == request.auth.uid;
+    }
+
+    match /blocks/{blockId} {
+      allow read, delete: if isSignedIn() && resource.data.blockerId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.blockerId == request.auth.uid;
+    }
+
+    match /supportTickets/{ticketId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAdmin();
+    }
+
+    // Discovery: Saved Searches & Wanted Posts
+    match /savedSearches/{searchId} {
+      allow read, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+    }
+
+    match /wantedPosts/{postId} {
+      allow read: if true;
+      allow create: if isSignedIn() && isNotBanned() &&
+        request.resource.data.requesterId == request.auth.uid;
+      allow update: if isAdmin() || (isSignedIn() && isNotBanned());
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.requesterId == request.auth.uid);
+    }
+
+    // FAQ Bot Entries & Platform Config
+    match /faqEntries/{faqId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /platformSettings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

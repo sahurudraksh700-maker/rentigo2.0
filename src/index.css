@@ -1,0 +1,39 @@
+@import "tailwindcss";
+@import "@designcodeio/threeui/style.css";
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --rk-accent: #e63f24;
+  --rk-accent-hover: #cc3118;
+}
+
+html {
+  font-family: 'Onest', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  font-family: 'Onest', system-ui, -apple-system, sans-serif;
+  font-weight: 300;
+}
+
+.shader-frame {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #060810;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: #e63f24;
+  color: #ffffff;
+}

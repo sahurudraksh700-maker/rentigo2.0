@@ -1,0 +1,31 @@
+{
+  "id": "/",
+  "name": "Rentigo — Campus Peer-to-Peer Rentals",
+  "short_name": "Rentigo",
+  "description": "Don't buy it. Rent cameras, projectors, formal wear, cycles, and campus essentials from classmates on your campus.",
+  "theme_color": "#060810",
+  "background_color": "#060810",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

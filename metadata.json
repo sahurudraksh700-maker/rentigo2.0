@@ -1,0 +1,6 @@
+{
+  "name": "Rentigo — Campus Peer-to-Peer Rentals",
+  "description": "Don't buy it. Rent cameras, projectors, formal wear, cycles, and campus essentials from classmates on your campus.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

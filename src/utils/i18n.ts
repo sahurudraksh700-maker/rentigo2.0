@@ -1,0 +1,66 @@
+import type { AppLanguage } from '../types/rentigo';
+
+export const TRANSLATIONS = {
+  en: {
+    browse: 'Browse',
+    wanted: 'Wanted',
+    wishlist: 'Wishlist',
+    messages: 'Messages',
+    notifications: 'Notifications',
+    safety: 'Safety',
+    dashboard: 'Dashboard',
+    referrals: 'Referrals',
+    settings: 'Settings',
+    admin: 'Admin',
+    listItem: 'List Item',
+    signInGoogle: 'Sign in with Google',
+    signOut: 'Sign out',
+    browseHeadline: 'Browse classmate rentals',
+    browseSub: 'Cameras, projectors, formal wear, cycles and study gear ready for pickup around campus.',
+    trendingCampus: 'Trending on your campus',
+    recentlyViewed: 'Recently viewed',
+    savedSearches: 'Saved searches',
+    requestToRent: 'Request to Rent',
+    messageOwner: 'Message Owner',
+    available: 'Available',
+    rented: 'Rented',
+    paused: 'Paused',
+    perDay: '/day',
+    deposit: 'deposit',
+    testPaymentsBanner: 'TEST MODE — Test payments only, no real money is charged.',
+  },
+  hi: {
+    browse: 'खोजें',
+    wanted: 'डिमांड बोर्ड',
+    wishlist: 'पसंदीदा',
+    messages: 'संदेश',
+    notifications: 'सूचनाएं',
+    safety: 'सुरक्षा',
+    dashboard: 'डैशबोर्ड',
+    referrals: 'रेफरल',
+    settings: 'सेटिंग्स',
+    admin: 'एडमिन',
+    listItem: 'आइटम जोड़ें',
+    signInGoogle: 'Google से साइन इन करें',
+    signOut: 'साइन आउट',
+    browseHeadline: 'कैंपस रेंटल देखें',
+    browseSub: 'कैमरा, प्रोजेक्टर, फॉर्मल वियर, साइकिल और स्टडी गियर सीधे अपने कैंपस के छात्रों से किराए पर लें।',
+    trendingCampus: 'आपके कैंपस में ट्रेंडिंग',
+    recentlyViewed: 'हाल ही में देखे गए',
+    savedSearches: 'सहेजी गई खोजें',
+    requestToRent: 'किराए का अनुरोध करें',
+    messageOwner: 'मालिक को संदेश भेजें',
+    available: 'उपलब्ध',
+    rented: 'किराए पर',
+    paused: 'रोका गया',
+    perDay: '/दिन',
+    deposit: 'जमा राशि',
+    testPaymentsBanner: 'टेस्ट मोड — केवल टेस्ट भुगतान, कोई असली पैसा नहीं काटा जाता।',
+  },
+} as const;
+
+export type TranslationKey = keyof typeof TRANSLATIONS.en;
+
+export function t(lang: AppLanguage, key: TranslationKey): string {
+  return TRANSLATIONS[lang]?.[key] ?? TRANSLATIONS.en[key];
+}

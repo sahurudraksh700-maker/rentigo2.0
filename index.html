@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rentigo — Campus Peer-to-Peer Rentals</title>
+    <meta
+      name="description"
+      content="Don't buy it. Rent cameras, projectors, formal wear, cycles, and campus essentials from verified classmates on your campus."
+    />
+    <meta property="og:title" content="Rentigo — Campus Peer-to-Peer Rentals" />
+    <meta
+      property="og:description"
+      content="Don't buy it. Rent cameras, projectors, formal wear, cycles, and campus essentials from verified classmates on your campus."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Rentigo" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Rentigo — Campus Peer-to-Peer Rentals" />
+    <meta
+      name="twitter:description"
+      content="Don't buy it. Rent cameras, projectors, formal wear, cycles, and campus essentials from verified classmates on your campus."
+    />
+    <meta name="theme-color" content="#060810" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Rentigo" />
+    <link rel="apple-touch-icon" href="/assets/aistudio/Rentigo_Gradient_Circle_Logo_6bb3db80.png" />
+    <link rel="icon" type="image/png" href="/assets/aistudio/Rentigo_Gradient_Circle_Logo_6bb3db80.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Rentigo",
+        "applicationCategory": "LifestyleApplication",
+        "operatingSystem": "All",
+        "description": "Student-run campus peer-to-peer rental marketplace for cameras, projectors, formal wear, cycles, and textbooks."
+      }
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function (regs) {
+          if (regs.length > 0) {
+            Promise.all(regs.map(function (r) { return r.unregister(); })).then(function () {
+              if ('caches' in window) {
+                caches.keys().then(function (keys) {
+                  return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+                }).catch(function () {});
+              }
+            });
+          }
+        }).catch(function () {});
+      }
+    </script>
+  </head>
+  <body style="background-color:#060810;color:#eceff4;">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
